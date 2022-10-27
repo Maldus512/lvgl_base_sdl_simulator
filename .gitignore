@@ -1,0 +1,22 @@
+# Binaries
+app
+
+# Environment
+.vscode
+compile_commands.json
+tags
+.env
+
+# Caches
+.cache
+__pycache__
+tmp
+build
+.sconsign.dblite
+
+# Intermediate files
+AUTOGEN_*
+*.pyc
+*.o
+.config
+.config.old
