@@ -66,8 +66,7 @@ static void driver_init(void) {
     disp_drv.ver_res  = SDL_VER_RES;       /*Set the vertical resolution in pixels*/
 
     lv_disp_t *disp = lv_disp_drv_register(&disp_drv); /*Register the driver and save the created display objects*/
-    lv_theme_default_init(disp, lv_color_make(0x77, 0x44, 0xBB), lv_color_make(0x14, 0x14, 0x3C), 1,
-                          &lv_font_montserrat_32);
+    lv_theme_default_init(disp, lv_color_make(0x77, 0x44, 0xBB), lv_color_make(0x14, 0x14, 0x3C), 1, lv_font_default());
 
     static lv_indev_drv_t indev_drv;
     lv_indev_drv_init(&indev_drv); /*Basic initialization*/
