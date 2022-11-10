@@ -20,3 +20,6 @@ AUTOGEN_*
 *.o
 .config
 .config.old
+
+# Others
+article

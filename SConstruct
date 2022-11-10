@@ -3,58 +3,46 @@ import multiprocessing
 from pathlib import Path
 
 
-PROGRAM = "./app"
+# Name of the application
+PROGRAM = "app"
+
+# Project paths
 MAIN = "main"
 COMPONENTS = "components"
 CONFIG = f"{MAIN}/config"
 LVGL = f"{COMPONENTS}/lvgl"
 DRIVERS = f"{COMPONENTS}/lv_drivers"
 
+# Compilation flags
 CFLAGS = ["-Wall", "-Wextra", "-g", "-O0", ]
-LDLIBS = ["-lSDL2"]
-CPPPATH = [COMPONENTS, MAIN, LVGL, DRIVERS, CONFIG]
+CPPPATH = [COMPONENTS, MAIN, LVGL, CONFIG, DRIVERS]
 CPPDEFINES = ["LV_CONF_INCLUDE_SIMPLE"]
 
 
-def PhonyTargets(
-    target,
-    action,
-    depends,
-    env=None,
-):
-    # Creates a Phony target
-    if not env:
-        env = DefaultEnvironment()
-    t = env.Alias(target, depends, action)
-    env.AlwaysBuild(t)
-
-
 def main():
+    # If not specified, guess how many threads the task can be split into
     num_cpu = multiprocessing.cpu_count()
     SetOption("num_jobs", num_cpu)
     print("Running with -j {}".format(GetOption("num_jobs")))
 
     env_options = {
-        "ENV": os.environ,
+        # Include the external environment to access DISPLAY and run the app as a target
         "CPPPATH": CPPPATH,
         "CPPDEFINES": CPPDEFINES,
         "CCFLAGS": CFLAGS,
-        "LIBS": LDLIBS,
+        "LIBS" : ["-lSDL2"],
     }
-
     env = Environment(**env_options)
-    env.Tool("compilation_db")
 
-    sources = [File(filename) for filename in Path(f"{MAIN}").rglob("*.c")]
+    # Project sources
+    sources = [File(filename) for filename in Path(
+        f"{MAIN}").rglob("*.c")]  # application files
     sources += [File(filename)
-                for filename in Path(f"{LVGL}/src").rglob("*.c")]
-    sources += [File(filename) for filename in Path(DRIVERS).rglob("*.c")]
+                for filename in Path(f"{LVGL}/src").rglob("*.c")]  # LVGL
+    sources += [File(filename)
+                for filename in Path(DRIVERS).rglob("*.c")]  # Drivers
 
-    prog = env.Program(PROGRAM, sources)
-
-    compileDB = env.CompilationDatabase("compile_commands.json")
-    env.Depends(prog, compileDB)
-    PhonyTargets("run", PROGRAM, prog, env)
+    env.Program(PROGRAM, sources)
 
 
 main()

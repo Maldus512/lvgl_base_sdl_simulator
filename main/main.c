@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <unistd.h>
-#include "sdl/sdl.h"
 #include "lvgl.h"
+#include "sdl/sdl.h"
 #include "utils/system_time.h"
 
 
@@ -9,9 +9,7 @@ static void driver_init(void);
 static void create_ui(void);
 
 
-int main(int argc, char *argv[]) {
-    (void)argc;
-    (void)argv;
+int main(void) {
     static unsigned long last_invoked = 0;
 
     lv_init();
@@ -24,7 +22,7 @@ int main(int argc, char *argv[]) {
     for (;;) {
         // Run LVGL engine
         if (last_invoked > 0) {
-            lv_tick_inc(time_interval(last_invoked, get_millis()));
+            lv_tick_inc(get_millis() - last_invoked);
         }
         last_invoked = get_millis();
         lv_timer_handler();
@@ -70,8 +68,7 @@ static void driver_init(void) {
 
     static lv_indev_drv_t indev_drv;
     lv_indev_drv_init(&indev_drv); /*Basic initialization*/
-    indev_drv.long_press_repeat_time = 250UL;
-    indev_drv.type                   = LV_INDEV_TYPE_POINTER;
-    indev_drv.read_cb                = sdl_mouse_read;
+    indev_drv.type    = LV_INDEV_TYPE_POINTER;
+    indev_drv.read_cb = sdl_mouse_read;
     lv_indev_drv_register(&indev_drv);
 }
