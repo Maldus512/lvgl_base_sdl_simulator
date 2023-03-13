@@ -4,7 +4,7 @@ from pathlib import Path
 
 
 # Name of the application
-PROGRAM = "app"
+PROGRAM = "app.html"
 
 # Project paths
 MAIN = "main"
@@ -26,6 +26,8 @@ def main():
     print("Running with -j {}".format(GetOption("num_jobs")))
 
     env_options = {
+        "ENV": os.environ,
+        "CC": ARGUMENTS.get('cc', 'gcc'),
         # Include the external environment to access DISPLAY and run the app as a target
         "CPPPATH": CPPPATH,
         "CPPDEFINES": CPPDEFINES,

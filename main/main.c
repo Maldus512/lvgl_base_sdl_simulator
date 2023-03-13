@@ -3,34 +3,43 @@
 #include "lvgl.h"
 #include "sdl/sdl.h"
 #include "utils/system_time.h"
+#include "emscripten.h"
 
 
 static void driver_init(void);
 static void create_ui(void);
+static void do_loop(void*arg);
 
 
 int main(void) {
-    static unsigned long last_invoked = 0;
-
+    printf("1\n");
     lv_init();
+    printf("2\n");
     sdl_init();
+    printf("3\n");
 
     driver_init();
+    printf("4\n");
     create_ui();
+    printf("5\n");
 
     printf("Begin main loop\n");
-    for (;;) {
-        // Run LVGL engine
-        if (last_invoked > 0) {
-            lv_tick_inc(get_millis() - last_invoked);
-        }
-        last_invoked = get_millis();
-        lv_timer_handler();
-
-        usleep(1000);
-    }
-
+    emscripten_set_main_loop_arg(do_loop, NULL, 100, 1);
+    //do_loop(NULL);
     return 0;
+}
+
+static void do_loop(void *arg) {
+    static unsigned long last_invoked = 0;
+
+    // Run LVGL engine
+    /*if (last_invoked > 0) {
+        lv_tick_inc(get_millis() - last_invoked);
+    }
+    last_invoked = get_millis();*/
+    lv_tick_inc(10);
+    lv_timer_handler();
+    //usleep(1000);
 }
 
 
@@ -67,7 +76,7 @@ static void driver_init(void) {
     lv_theme_default_init(disp, lv_color_make(0x77, 0x44, 0xBB), lv_color_make(0x14, 0x14, 0x3C), 1, lv_font_default());
 
     static lv_indev_drv_t indev_drv;
-    lv_indev_drv_init(&indev_drv); /*Basic initialization*/
+    lv_indev_drv_init(&indev_drv); 
     indev_drv.type    = LV_INDEV_TYPE_POINTER;
     indev_drv.read_cb = sdl_mouse_read;
     lv_indev_drv_register(&indev_drv);
